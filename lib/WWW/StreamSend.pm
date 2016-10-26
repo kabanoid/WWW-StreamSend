@@ -9,6 +9,7 @@ use AutoLoader qw(AUTOLOAD);
 use LWP::UserAgent;
 use XML::Simple;
 use Carp ();
+use HTTP::Status qw(:constants);
 
 use WWW::StreamSend::Audience;
 use WWW::StreamSend::Subscriber;
@@ -84,7 +85,7 @@ sub get_audience {
         $self->_send_request('audiences', $params->{id}) :
         $self->_send_request('audiences');
 
-    if ($res->{code} == '200') {
+    if ($res->{code} == HTTP_OK) {
         my $xml = $res->{content};
         my $data = XMLin($xml, ForceArray=>1);
 
@@ -119,7 +120,7 @@ sub add_subscriber {
         }
     );
 
-    return $res->{code} == 200 ? 1 : 0;
+    return $res->{code} == HTTP_OK 1 : 0;
 }
 
 sub _send_request {
@@ -146,7 +147,7 @@ sub _send_request {
     my $res = $self->{ua}->request($req);
 
     if ($res->is_success) {
-        return ({code => 200, content => $res->content});
+        return ({code => HTTP_OK, content => $res->content});
     }
     else {
         return ({code => $res->code, content => $res->status_line});
